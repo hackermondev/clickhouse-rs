@@ -1,7 +1,7 @@
 use bytes::BufMut;
 use clickhouse_types::put_leb128;
 use serde::{
-    ser::{Impossible, SerializeSeq, SerializeStruct, SerializeTuple, Serializer},
+    ser::{Impossible, SerializeMap, SerializeSeq, SerializeStruct, SerializeTuple, Serializer},
     Serialize,
 };
 
@@ -34,7 +34,7 @@ macro_rules! impl_num {
 impl<B: BufMut> Serializer for &'_ mut RowBinarySerializer<B> {
     type Error = Error;
     type Ok = ();
-    type SerializeMap = Impossible<(), Error>;
+    type SerializeMap = Self;
     type SerializeSeq = Self;
     type SerializeStruct = Self;
     type SerializeStructVariant = Impossible<(), Error>;
@@ -178,7 +178,7 @@ impl<B: BufMut> Serializer for &'_ mut RowBinarySerializer<B> {
 
     #[inline]
     fn serialize_map(self, _len: Option<usize>) -> Result<Self::SerializeMap> {
-        panic!("maps are unsupported, use `Vec<(A, B)>` instead");
+        Ok(self)
     }
 
     #[inline]
@@ -246,5 +246,26 @@ impl<B: BufMut> SerializeTuple for &'_ mut RowBinarySerializer<B> {
     #[inline]
     fn end(self) -> Result<()> {
         Ok(())
+    }
+}
+
+impl <B: BufMut> SerializeMap for &'_ mut RowBinarySerializer<B> {
+    type Error = Error;
+    type Ok = ();
+    
+    fn serialize_key<T>(&mut self, _: &T) -> std::result::Result<(), Self::Error>
+    where
+        T: ?Sized + Serialize {
+        Ok(())
+    }
+    
+    fn serialize_value<T>(&mut self, value: &T) -> std::result::Result<(), Self::Error>
+    where
+        T: ?Sized + Serialize {
+        value.serialize(&mut **self)
+    }
+    
+    fn end(self) -> std::result::Result<Self::Ok, Self::Error> {
+        todo!()
     }
 }
