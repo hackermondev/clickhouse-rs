@@ -7,7 +7,7 @@ extern crate static_assertions;
 
 pub use self::{
     compression::Compression,
-    row::{Row, RowOwned, RowRead, RowWrite},
+    row::{Row, RowOwned, RowRead, RowWrite, RowKind},
 };
 use self::{error::Result, http_client::HttpClient};
 pub use clickhouse_derive::Row;
