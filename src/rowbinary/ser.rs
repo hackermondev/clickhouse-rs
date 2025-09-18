@@ -266,6 +266,6 @@ impl <B: BufMut> SerializeMap for &'_ mut RowBinarySerializer<B> {
     }
     
     fn end(self) -> std::result::Result<Self::Ok, Self::Error> {
-        todo!()
+        Ok(())
     }
 }
