@@ -53,10 +53,10 @@ fn row_impl(input: DeriveInput) -> Result<TokenStream> {
     let name = input.ident;
 
     let result = match &input.data {
-        Data::Struct(data) if data.fields.is_empty() => {
-            let reason = "`Row` cannot be derived for unit or empty structs";
-            Err(Error::new(name.span(), reason))
-        }
+        // Data::Struct(data) if data.fields.is_empty() => {
+        //     let reason = "`Row` cannot be derived for unit or empty structs";
+        //     Err(Error::new(name.span(), reason))
+        // }
         Data::Struct(data) => column_names(data, &cx, &container),
         Data::Enum(_) | Data::Union(_) => {
             let reason = "`Row` can only be derived for structs";
